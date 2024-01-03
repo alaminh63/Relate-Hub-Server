@@ -42,7 +42,7 @@ async function run() {
     });
     app.get("/contacts/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) }
+      const query = { _id: new ObjectId(id) };
       const result = await contactCollection.findOne(query);
       res.send(result);
     });
@@ -51,6 +51,28 @@ async function run() {
       const result = await contactCollection.deleteOne({
         _id: new ObjectId(id),
       });
+      res.send(result);
+    });
+
+    app.put("/contacts/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const data = req.body;
+      const result = await contactCollection.updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            address: data.address,
+            photoURL: data.photoURL,
+          },
+        },
+        {
+          upsert: true,
+        }
+      );
       res.send(result);
     });
     await client.db("admin").command({ ping: 1 });
