@@ -2,9 +2,9 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 3000;
+const bodyParser = require("body-parser");
 
-
-
+app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
 
@@ -36,10 +36,23 @@ async function run() {
       res.send(result);
       console.log(result);
     });
-  app.get("/contacts", async(req,res)=>{
-    const result = await contactCollection.find().toArray();
-    res.send(result);
-  })
+    app.get("/contacts", async (req, res) => {
+      const result = await contactCollection.find().toArray();
+      res.send(result);
+    });
+    app.get("/contacts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await contactCollection.findOne(query);
+      res.send(result);
+    });
+    app.delete("/deleteContact/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await contactCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
+      res.send(result);
+    });
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
